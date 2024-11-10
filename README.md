@@ -1,6 +1,7 @@
 # 图书管理系统
 
 一个基于Flask的图书馆管理系统，提供图书管理、借阅、评论等功能。
+附带实验报告
 
 ![image-20241110112014033](https://yeadon-picture.oss-cn-qingdao.aliyuncs.com/img/image-20241110112014033.png)
 
