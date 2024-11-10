@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}图书列表 - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <form action="{{ url_for('book.search') }}" method="GET" class="row g-3">
+        <div class="col-md-6">
+            <input type="text" class="form-control" name="q" placeholder="搜索书名、作者或ISBN" 
+                   value="{{ request.args.get('q', '') }}">
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" name="category">
+                <option value="">所有类别</option>
+                <option value="文学" {% if request.args.get('category')=='文学' %}selected{% endif %}>文学</option>
+                <option value="科技" {% if request.args.get('category')=='科技' %}selected{% endif %}>科技</option>
+                <option value="历史" {% if request.args.get('category')=='历史' %}selected{% endif %}>历史</option>
+                <option value="艺术" {% if request.args.get('category')=='艺术' %}selected{% endif %}>艺术</option>
+                <option value="教育" {% if request.args.get('category')=='教育' %}selected{% endif %}>教育</option>
+                <option value="其他" {% if request.args.get('category')=='其他' %}selected{% endif %}>其他</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">搜索</button>
+        </div>
+    </form>
+</div>
+
+<div class="row">
+    {% for book in books %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ book.title }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ book.author }}</h6>
+                <p class="card-text">
+                    <small>ISBN: {{ book.isbn }}</small><br>
+                    <small>类别: {{ book.category }}</small><br>
+                    <small>库存: {{ book.available_copies }}/{{ book.total_copies }}</small>
+                </p>
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('book.book_detail', id=book.id) }}" 
+                       class="btn btn-primary btn-sm">详情</a>
+                    {% if current_user.is_authenticated %}
+                        {% if book.available_copies > 0 %}
+                            <a href="{{ url_for('loan.borrow_book', book_id=book.id) }}" 
+                               class="btn btn-success btn-sm">借阅</a>
+                        {% else %}
+                            <button class="btn btn-secondary btn-sm" disabled>无库存</button>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not books %}
+<div class="alert alert-info">
+    没有找到符合条件的图书
+</div>
+{% endif %}
+{% endblock %} 

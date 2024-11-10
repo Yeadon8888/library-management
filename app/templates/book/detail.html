@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">{{ book.title }}</h2>
+                <div class="book-info">
+                    <p><strong>作者：</strong>{{ book.author }}</p>
+                    <p><strong>ISBN：</strong>{{ book.isbn }}</p>
+                    <p><strong>出版社：</strong>{{ book.publisher }}</p>
+                    <p><strong>类别：</strong>{{ book.category }}</p>
+                    <p><strong>库存状态：</strong>{{ book.available_copies }}/{{ book.total_copies }}</p>
+                    {% if book.comments %}
+                    <p><strong>平均评分：</strong>
+                        {{ "%.1f"|format(book.comments|selectattr("rating")|map(attribute="rating")|list|avg) }}
+                        ({{ book.comments|length }}条评价)
+                    </p>
+                    {% endif %}
+                </div>
+                
+                {% if current_user.is_authenticated %}
+                    {% if book.available_copies > 0 %}
+                        <a href="{{ url_for('loan.borrow_book', book_id=book.id) }}" 
+                           class="btn btn-success">借阅此书</a>
+                    {% else %}
+                        <button class="btn btn-secondary" disabled>暂无库存</button>
+                        <a href="{{ url_for('book.reserve', book_id=book.id) }}" 
+                           class="btn btn-warning">预约此书</a>
+                    {% endif %}
+                    
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('book.book_edit', id=book.id) }}" 
+                           class="btn btn-primary">编辑信息</a>
+                        <button type="button" class="btn btn-danger" 
+                                data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            删除图书
+                        </button>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 评论区 -->
+        <div class="card">
+            <div class="card-header">读者评价</div>
+            <div class="card-body">
+                {% if current_user.is_authenticated %}
+                    <form method="POST" action="{{ url_for('book.add_comment', book_id=book.id) }}" class="mb-4">
+                        <div class="mb-3">
+                            <label class="form-label">评分</label>
+                            <select name="rating" class="form-select" required>
+                                <option value="5">5星 - 非常好</option>
+                                <option value="4">4星 - 好</option>
+                                <option value="3">3星 - 一般</option>
+                                <option value="2">2星 - 差</option>
+                                <option value="1">1星 - 很差</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">评论内容</label>
+                            <textarea name="content" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">提交评论</button>
+                    </form>
+                {% endif %}
+
+                {% for comment in book.comments|selectattr("is_approved")|sort(attribute="created_at", reverse=true) %}
+                <div class="comment mb-3">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>{{ comment.user.username }}</strong>
+                            <small class="text-muted">{{ comment.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                        <div class="rating">
+                            {% for _ in range(comment.rating) %}⭐{% endfor %}
+                        </div>
+                    </div>
+                    <p class="mb-0">{{ comment.content }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if current_user.is_admin %}
+<!-- 删除确认对话框 -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">确认删除</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                确定要删除《{{ book.title }}》吗？此操作不可撤销。
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <form action="{{ url_for('book.book_delete', id=book.id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">确认删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %} 

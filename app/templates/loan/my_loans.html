@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}我的借阅 - {{ super() }}{% endblock %}
+
+{% block content %}
+<h2>我的借阅记录</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>书名</th>
+            <th>借阅日期</th>
+            <th>应还日期</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for loan in loans %}
+        <tr>
+            <td>{{ loan.book.title }}</td>
+            <td>{{ loan.borrow_date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ loan.due_date.strftime('%Y-%m-%d') }}</td>
+            <td>
+                {% if loan.status == 'borrowed' %}
+                    {% if loan.due_date < current_time %}
+                        <span class="text-danger">已逾期</span>
+                    {% else %}
+                        <span class="text-success">借阅中</span>
+                    {% endif %}
+                {% else %}
+                    <span class="text-secondary">已归还</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if loan.status == 'borrowed' %}
+                    <a href="{{ url_for('loan.return_book', book_id=loan.book.id) }}" 
+                       class="btn btn-primary btn-sm">归还</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if not loans %}
+<div class="alert alert-info">
+    您还没有借阅记录
+</div>
+{% endif %}
+{% endblock %} 

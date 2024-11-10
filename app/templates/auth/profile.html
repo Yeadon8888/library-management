@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">个人信息设置</div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label>用户名</label>
+                        <input type="text" class="form-control" value="{{ current_user.username }}" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label>邮箱</label>
+                        <input type="email" name="email" class="form-control" value="{{ current_user.email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>当前密码</label>
+                        <input type="password" name="current_password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>新密码（可选）</label>
+                        <input type="password" name="new_password" class="form-control">
+                        <small class="text-muted">密码必须包含大小写字母和数字，且长度不少于8位</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">更新信息</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

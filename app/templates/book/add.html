@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}添加图书 - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">添加新图书</div>
+            <div class="card-body">
+                <form method="POST" id="addBookForm" novalidate>
+                    <div class="mb-3">
+                        <label for="isbn" class="form-label">ISBN</label>
+                        <input type="text" class="form-control" id="isbn" name="isbn" 
+                               pattern="\d{10}|\d{13}" required
+                               data-bs-toggle="tooltip" 
+                               title="请输入10位或13位ISBN号">
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">书名</label>
+                        <input type="text" class="form-control" id="title" name="title" required
+                               maxlength="200">
+                    </div>
+                    <div class="mb-3">
+                        <label for="author" class="form-label">作者</label>
+                        <input type="text" class="form-control" id="author" name="author" required
+                               maxlength="100">
+                    </div>
+                    <div class="mb-3">
+                        <label for="publisher" class="form-label">出版社</label>
+                        <input type="text" class="form-control" id="publisher" name="publisher"
+                               maxlength="100">
+                    </div>
+                    <div class="mb-3">
+                        <label for="category" class="form-label">类别</label>
+                        <select class="form-select" id="category" name="category" required>
+                            <option value="">请选择类别</option>
+                            <option value="文学">文学</option>
+                            <option value="科技">科技</option>
+                            <option value="历史">历史</option>
+                            <option value="艺术">艺术</option>
+                            <option value="教育">教育</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="total_copies" class="form-label">库存数量</label>
+                        <input type="number" class="form-control" id="total_copies" name="total_copies" 
+                               min="1" value="1" required>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">添加图书</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
